@@ -20,3 +20,14 @@ authors:
     email: a.bachoumis@gmail.com
     affiliation: University of Patras
     orcid: 'https://orcid.org/0000-0003-3887-9789'
+identifiers:
+  - type: url
+    value: 'https://github.com/tombax7/FLITC-application'
+abstract: >-
+  A data-driven deep learning-based Fault Location
+  Identification and Type Classification for radial
+  and active distribution grids. It also contains the
+  source code for dataset generation for
+  hyperparameter tuning, training, validation and
+  testing of the models.
+license: MIT
