@@ -1,0 +1,22 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: FLITC-application
+message: >-
+  Please cite this dataset using the metadata from
+  'preferred-citation'.
+type: software
+authors:
+  - given-names: 'Vasilis Rizeakos '
+    name-particle: Vasilis
+    family-names: Rizeakos
+    email: vas.rizeakos@gmail.com
+    affiliation: University of Patras
+    orcid: 'https://orcid.org/0000-0003-4475-6232'
+  - given-names: Athanasios Bachoumis
+    name-particle: Athanasios
+    family-names: Bachoumis
+    email: a.bachoumis@gmail.com
+    affiliation: University of Patras
+    orcid: 'https://orcid.org/0000-0003-3887-9789'
