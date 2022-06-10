@@ -23,6 +23,7 @@ authors:
 identifiers:
   - type: url
     value: 'https://github.com/tombax7/FLITC-application'
+url: 'https://github.com/tombax7/FLITC-application'
 abstract: >-
   A data-driven deep learning-based Fault Location
   Identification and Type Classification for radial
