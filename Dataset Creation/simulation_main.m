@@ -18,7 +18,7 @@ for fault_type = 1 : length(Scenario.Name)
         fault_start = Scenario.Time{1,fault_type}(idx);
         fault_duration = Scenario.Time{2,fault_type}(idx);
         tic
-        Data_out = Int_Generate_Fault_Data_2(fault_name, curr_loads, next_loads, fault_pv, fault_resistance, fault_start, fault_duration);
+        Data_out = Generate_Fault_Data(fault_name, curr_loads, next_loads, fault_pv, fault_resistance, fault_start, fault_duration);
         toc
         if fault_type==1
             idx_start=0;
