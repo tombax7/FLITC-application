@@ -1,10 +1,12 @@
 This is the first step in the FLITC application: The Dataset Creation Process
+
 The folder contains the Simulink created .slx file of the created LVDG model as used by the application. The other files contain
 the code neccessary for running the simulation as well as a .mat file with real Active Power measurements from consumers and PV
 microgeneration producers spanning one month.
 
 
 First Step: run Create_network.m
+
   Create_network.m handles the creation of simulated environment's variables such as:
     Consumer/Producer Loads
     Fault Type
@@ -14,6 +16,7 @@ First Step: run Create_network.m
    
    
 Second Step: run simulation_main.m
+
   simulation_main.m is the main loop function simulating all fault scenarios created at the previous step. After running each
   scenario, it saves the Voltage/Current measurements in a .mat file that will be used later in the next FLITC's process.
   
