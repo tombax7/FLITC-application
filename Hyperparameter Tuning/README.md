@@ -18,7 +18,7 @@ Below, a process line is shown explaining the order of the scripts' execution.
 9. *sort_classes.py* creates a dataset file containing only the faulty branch voltage measurements.
 10. *sort_distances.py* creates a dataset file similarly to *sort_classes.py*.
 11. *DMD.py* applies the [Dynamic Mode Decomposition](https://en.wikipedia.org/wiki/Dynamic_mode_decomposition) Dimensionality Reduction algorithm to the datasets.
-12. *CWT.py* applies the [Continuous Wavelet Transform](https://en.wikipedia.org/wiki/Continuous_wavelet_transform) to the datasets.
+12. *CWT.py* applies the [Continuous Wavelet Transform](https://en.wikipedia.org/wiki/Continuous_wavelet_transform) algorithm to the datasets.
 13. *reduce_branch_dataset.py* applies Dimensionality Reduction to the faulted feeder branch measurements by averaging each branch node per phase.
 14. *Feeder_HyperOpt_CWT_not_full_v1.py* searches the best-suited hyperparameters for the Faulty Feeder Neural Network (FFNN).
 15. *Branch_HyperOpt_DMDCWT_1_not_full_v2.py* searches the best-suited hyperparameters for the Feeder A - Faulty Branch Neural Network (FBNN_1).
