@@ -142,8 +142,14 @@ def create_model_v2(input_shapes, rates, kernel_initializer, kernel_regularizer,
     return model
 
 
-def write_csv(dataframe):
-    csv_loc = r'\dmdcwt_branch_id_3_not_full_v1.csv'
+def best_csv(dataframe, best_csv_loc):
+    sorted_df = dataframe.sort_values(by=['Val_Loss (%)'])
+    best_df = sorted_df.head(3)
+    write_csv(best_df, best_csv_loc)
+    return best_df
+
+
+def write_csv(dataframe, csv_loc):
     try:
         outfile = open(results_dic + csv_loc, 'wb')
         dataframe.to_csv(outfile)
@@ -224,7 +230,8 @@ def f_nn(params):
     df = pd.DataFrame(results_of_fnn, columns=names)
 
     # Change command according to the training set
-    write_csv(df)
+    write_csv(df, r'\dmdcwt_branch_id_3_not_full_v1.csv')
+    best_csv(df, r'\best_dmdcwt_branch_id_3_not_full_v1.csv')
 
     return {'loss': cross, 'status': STATUS_OK, 'model': model, 'params': params}
 
