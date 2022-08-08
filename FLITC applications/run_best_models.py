@@ -1,11 +1,8 @@
-from hyperopt import hp, tpe, fmin, Trials, STATUS_OK
-from hyperopt.pyll.base import scope
 import os
 import joblib
 import tensorflow
 import numpy as np
 import pandas as pd
-from tensorflow.keras.utils import plot_model
 import create_topology as top
 from ast import literal_eval
 from tensorflow.keras.models import Sequential
@@ -17,7 +14,6 @@ import matplotlib.pyplot as plt
 import logging
 from tqdm.keras import TqdmCallback
 import random
-import time
 
 random.seed()
 rand_num = int(100 * random.random())
@@ -172,14 +168,42 @@ def create_model_v2(input_shapes, rates, kernel_initializer, kernel_regularizer,
     return model
 
 
+def create_model_v3(input_shapes, rates, kernel_initializer, no_layer, unit):
+    # Keras model
+    model = Sequential()
+    # First layer specifies input_shape
+    model.add(Conv2D(64, 5, activation='relu', padding='same', input_shape=input_shapes,
+                     kernel_initializer=kernel_initializer, data_format='channels_last'))
+    model.add(Dropout(rate=rates))
+    model.add(MaxPooling2D())
+    model.add(Conv2D(32, 5, activation='relu', padding='same', kernel_initializer=kernel_initializer,
+                     data_format='channels_last'))
+    model.add(Dropout(rate=2*rates))
+    model.add(MaxPooling2D())
+    model.add(Flatten())
+
+    # Max 5 Full connected hidden layers
+    for idx in range(no_layer - 1):
+        model.add(Dense(units=unit[idx], activation='relu', kernel_initializer=kernel_initializer))
+        rt = rates*(3 + float(idx))
+        model.add(Dropout(rate=rt))
+
+    model.add(Dense(1, activation='sigmoid'))
+
+    return model
+
+
 def evaluate_model(dataset, output, rs, dur, model, direc, scen_len):
     if direc == branch_dic:
-        if len(output[0]) == 4: idx = 1
-        elif len(output[0]) == 3: idx = 2
-        else: idx = 3
+        if len(output[0]) == 4:
+            idx = 1
+        elif len(output[0]) == 3:
+            idx = 2
+        else:
+            idx = 3
 
     epochs = 200
-    history = np.empty(4, epochs)
+    history = np.empty([4, epochs], dtype=float)
     x_axis = range(1, epochs+1)
     print(model)
     batch_size, layers = int(model['batch_size']), int(model['layers'])
@@ -192,16 +216,18 @@ def evaluate_model(dataset, output, rs, dur, model, direc, scen_len):
                                                                                                    rs, dur, scen_len)
 
     # define model
-    num_features, num_outputs = x_train.shape[1], y_train.shape[1]
+    if direc != distance_dic:
+        num_outputs = y_train.shape[1]
     shape_input = (x_train.shape[1], x_train.shape[2], x_train.shape[3])
 
     # define model
     verbose = 1
 
     # define model
-    if direc == branch_dic:
-        if idx == 1 or idx == 2:
-            best_model = create_model_v2(shape_input, rate, "he_normal", L2(l=0.01), num_outputs, layers, units)
+    if direc == branch_dic and (idx == 1 or idx == 2):
+        best_model = create_model_v2(shape_input, rate, "he_normal", L2(l=0.01), num_outputs, layers, units)
+    elif direc == distance_dic:
+        best_model = create_model_v3(shape_input, rate, "he_normal", layers, units)
     else:
         best_model = create_model(shape_input, rate, "he_normal", num_outputs, layers, units)
 
@@ -226,11 +252,10 @@ def evaluate_model(dataset, output, rs, dur, model, direc, scen_len):
             history[len_of_history:] = [history[len_of_history - 1] for _ in range(epochs - len_of_history)]
 
         plt.rc('font', size=7)
-        plt.plot(100 * history)
+        plt.plot(x_axis, 100 * history[0, :], linewidth=3)
         plt.title('Loss of model')
         plt.ylabel('Loss (%)')
         plt.xlabel('Trials')
-        plt.legend(loc='upper right', fontsize='small')
         plt.show()
 
     else:
@@ -248,9 +273,6 @@ def evaluate_model(dataset, output, rs, dur, model, direc, scen_len):
         if len_of_history < epochs:
             history[3, len_of_history:] = [history[3, len_of_history-1] for _ in range(epochs - len_of_history)]
 
-        max_loss = np.amax(history[1, :])
-        max_val_loss = np.amax(history[3, :])
-
         plt.rc('font', size=7)
         fig, axs = plt.subplots(nrows=2, ncols=2, dpi=250, figsize=(10, 10), sharex=True)
         if direc == branch_dic:
@@ -263,28 +285,24 @@ def evaluate_model(dataset, output, rs, dur, model, direc, scen_len):
         axs[0, 0].set_ylim([-5, 105])
         axs[0, 0].set_xlabel('Trials')
         axs[0, 0].set_ylabel('Accuracy (%)')
-        axs[0, 0].legend(loc='lower right', fontsize='small')
 
         axs[0, 1].plot(x_axis, 100 * history[1, :], linewidth=3)
         axs[0, 1].set_title('Loss of models')
         axs[0, 1].set_ylim([-5, 105])
         axs[0, 1].set_xlabel('Trials')
         axs[0, 1].set_ylabel('Loss (%)')
-        axs[0, 1].legend(loc='upper right', fontsize='small')
 
         axs[1, 0].plot(x_axis, 100 * history[2, :], linewidth=3)
         axs[1, 0].set_title('Validation Accuracy of models')
         axs[1, 0].set_ylim([-5, 105])
         axs[1, 0].set_xlabel('Trials')
         axs[1, 0].set_ylabel('Validation Accuracy (%)')
-        axs[1, 0].legend(loc='lower right', fontsize='small')
 
         axs[1, 1].plot(x_axis, 100 * history[3, :], linewidth=3)
         axs[1, 1].set_title('Validation Loss of models')
         axs[1, 1].set_ylim([-5, 105])
         axs[1, 1].set_xlabel('Trials')
         axs[1, 1].set_ylabel('Validation Loss (%)')
-        axs[1, 1].legend(loc='upper right', fontsize='small')
 
         if direc == branch_dic:
             plt.savefig(direc + r'\model_' + str(idx) + '.jpg')
@@ -313,16 +331,16 @@ feeder_history = evaluate_model(I_CWT, Feeder_Output, Feeder_Rs, Feeder_Duration
 joblib.dump(feeder_history, feeder_dic + r'\feeder_history.joblib')
 
 # Load Branch_ID data
-branch_best_models_loc = [[] for _ in range(2)]
-branch_best_models_loc[0] = results_dic + r'\best_dmdcwt_branch_id_1_not_full_v2.csv'
-branch_best_models_loc[1] = results_dic + r'\best_dmdcwt_branch_id_2_not_full_v2.csv'
-branch_best_models_loc[2] = results_dic + r'\best_dmdcwt_branch_id_3_not_full_v1.csv'
+branch_best_models_loc = [[] for _ in range(3)]
+branch_best_models_loc[0] = branch_dic + r'\best_dmdcwt_branch_id_1_not_full_v2.csv'
+branch_best_models_loc[1] = branch_dic + r'\best_dmdcwt_branch_id_2_not_full_v2.csv'
+branch_best_models_loc[2] = branch_dic + r'\best_dmdcwt_branch_id_3_not_full_v1.csv'
 
 V_feeder_CWT, Branch_Output_sorted, branch_best_models = [[] for _ in range(feeders_num)], \
                                                          [[] for _ in range(feeders_num)], \
                                                          [[] for _ in range(feeders_num)]
 Branch_Rs, Branch_Duration = [[] for _ in range(feeders_num)], [[] for _ in range(feeders_num)]
-for index in range(2):  # feeder_num
+for index in range(3):  # feeder_num
     data_path = directory + r'\V_feeder_DMDCWT_reduced_' + str(index + 1) + '_not_full.joblib'
     branch_class_path = directory + r'\Branch_Output_sorted_' + str(index + 1) + '.joblib'
     Rs_path = directory + r'\Rs_FBNN_' + str(index + 1) + '.joblib'
@@ -345,7 +363,7 @@ branch_f3_history = evaluate_model(V_feeder_CWT[2], Branch_Output_sorted[2], Bra
 joblib.dump(branch_f3_history, branch_dic + r'\branch_f3_history.joblib')
 
 # Load Fault_ID data
-fault_best_models_loc = fault_dic + r'\best_dmdcwt_fault_id_not_full_v1.csv'
+fault_best_models_loc = fault_dic + r'\best_dmdcwt_fault_id_not_full_v2.csv'
 V_branch_DMDCWT_path = directory + r'\V_branch_DMDCWT.joblib'
 Fault_Class_sorted_path = directory + r'\Fault_Class_sorted_reduced.joblib'
 Rs_path = directory + r'\Rs_FCNN.joblib'
@@ -357,12 +375,12 @@ Fault_Rs = np.array(joblib.load(Rs_path))
 Fault_Duration = np.array(joblib.load(Duration_path))
 
 # Run Branch Evaluation
-fault_history = evaluate_model(V_branch_DMDCWT, Fault_Class_sorted, Fault_Rs, Fault_Rs, fault_best_models.iloc[0],
+fault_history = evaluate_model(V_branch_DMDCWT, Fault_Class_sorted, Fault_Rs, Fault_Duration, fault_best_models.iloc[0],
                                fault_dic, scenario_length[1:])
 joblib.dump(fault_history, fault_dic + r'\fault_history.joblib')
 
 # Load Distance_ID data
-distance_best_models_loc = results_dic + r'\best_dmdcwt_distance_id_not_full_v1.csv'
+distance_best_models_loc = distance_dic + r'\best_dmdcwt_distance_id_not_full_v1.csv'
 V_branch_DMDCWT_path = directory + r'\V_branch_DMDCWT.joblib'
 Distance_Class_sorted_path = directory + r'\Distance_Class_sorted.joblib'
 Rs_path = directory + r'\Rs_FCNN.joblib'
@@ -374,6 +392,6 @@ Distance_Rs = np.array(joblib.load(Rs_path))
 Distance_Duration = np.array(joblib.load(Duration_path))
 
 # Run Distance Evaluation
-distance_history = evaluate_model(V_branch_DMDCWT, Distance_Class_sorted, Fault_Rs, Fault_Rs,
-                                  distance_best_models_loc.iloc[0], distance_dic, scenario_length[1:])
+distance_history = evaluate_model(V_branch_DMDCWT, Distance_Class_sorted, Distance_Rs, Distance_Duration,
+                                  distance_best_models.iloc[0], distance_dic, scenario_length[1:])
 joblib.dump(distance_history, distance_dic + r'\distance_history.joblib')
