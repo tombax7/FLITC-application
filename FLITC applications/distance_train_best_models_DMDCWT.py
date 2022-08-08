@@ -147,7 +147,7 @@ def evaluate_model(round_i, dataset, output, rs, dur, model_df):
     return history
 
 
-best_models_loc = results_dic + r'\best_dmdcwt_distance_id_not_full.csv'
+best_models_loc = results_dic + r'\best_dmdcwt_distance_id_not_full_v1.csv'
 best_models = pd.read_csv(best_models_loc, index_col=0)
 
 for part in range(8):
