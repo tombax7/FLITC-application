@@ -38,7 +38,7 @@ I_CWT_not_full_path = directory + r'\I_CWT_not_full.joblib'
 Class_path = directory + r'\Feeder_Output_4_Outputs.joblib'
 Rs_path = directory + r'\Rs_FFNN.joblib'
 Duration_path = directory + r'\Duration_FFNN.joblib'
-best_models_loc = results_dic + r'\best_cwt_feeder_id_not_full.csv'
+best_models_loc = results_dic + r'\best_cwt_feeder_id_not_full_v1.csv'
 
 # Change load file for different dataset
 # I_CWT = joblib.load(I_CWT_path)
