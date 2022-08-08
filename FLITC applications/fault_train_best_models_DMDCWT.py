@@ -33,7 +33,7 @@ tf.config.experimental.set_memory_growth(physical_devices[0], True)
 # Access path where dataset is stored
 directory = os.getcwd()
 results_dic = directory + r'\results\Fault_ID'
-best_models_loc = results_dic + r'\best_dmdcwt_fault_id_v2.csv'
+best_models_loc = results_dic + r'\best_dmdcwt_fault_id_not_full_v2.csv'
 
 tree, nodes, grid_length = top.create_grid()
 leaf_nodes = top.give_leaves(nodes[0])
