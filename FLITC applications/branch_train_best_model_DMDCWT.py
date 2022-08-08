@@ -48,10 +48,10 @@ branches_num = len(grid_path)  # Number of grid's branches: 9
 metrics_num = len(nodes)  # Number of voltage meters: 33
 distance_sections = 5  # Number of sections a branch is divided: 5
 
-best_models_loc = [[] for _ in range(2)]
+best_models_loc = [[] for _ in range(3)]
 best_models_loc[0] = results_dic + r'\best_dmdcwt_branch_id_1_not_full_v2.csv'
 best_models_loc[1] = results_dic + r'\best_dmdcwt_branch_id_2_not_full_v2.csv'
-# best_models_loc[2] = results_dic + r'\best_dmdcwt_branch_id_3_not_full_v2.csv'
+best_models_loc[2] = results_dic + r'\best_dmdcwt_branch_id_3_not_full_v1.csv'
 
 tree, nodes, grid_length = top.create_grid()
 leaf_nodes = top.give_leaves(nodes[0])
@@ -71,7 +71,7 @@ distance_sections = 5  # Number of sections a branch is divided: 5
 V_feeder_CWT, Branch_Output_sorted, best_models = [[] for _ in range(feeders_num)], [[] for _ in range(feeders_num)], \
                                                   [[] for _ in range(feeders_num)]
 Rs, Duration = [[] for _ in range(feeders_num)], [[] for _ in range(feeders_num)]
-for index in range(2): # feeder_num
+for index in range(feeder_num): 
     data_path = directory + r'\V_feeder_DMDCWT_reduced_' + str(index + 1) + '_not_full.joblib'
     class_path = directory + r'\Branch_Output_sorted_' + str(index + 1) + '.joblib'
     Rs_path = directory + r'\Rs_FBNN_' + str(index + 1) + '.joblib'
@@ -89,6 +89,31 @@ def shuffle_dataset(dataset, output_class, rs, dur):
                                                                                                 rs, dur, test_size=0.2,
                                                                                                 random_state=rand_num)
     return x_train, x_test, y_train, y_test, rs_train, rs_test, dur_train, dur_test
+
+
+def create_model(input_shapes, rates, kernel_initializer, no_outputs, no_layer, unit):
+    # Keras model
+    model = Sequential()
+    # First layer specifies input_shape
+    model.add(Conv2D(64, 5, activation='relu', padding='same', input_shape=input_shapes,
+                     kernel_initializer=kernel_initializer, data_format='channels_last'))
+    model.add(Dropout(rate=rates))
+    model.add(MaxPooling2D())
+    model.add(Conv2D(32, 5, activation='relu', padding='same', kernel_initializer=kernel_initializer,
+                     data_format='channels_last'))
+    model.add(Dropout(rate=2*rates))
+    model.add(MaxPooling2D())
+    model.add(Flatten())
+
+    # Max 5 Full connected hidden layers
+    for idx in range(no_layer - 1):
+        model.add(Dense(units=unit[idx], activation='relu', kernel_initializer=kernel_initializer))
+        rt = rates*(3 + float(idx))
+        model.add(Dropout(rate=rt))
+
+    model.add(Dense(no_outputs, activation='softmax'))
+
+    return model
 
 
 def create_model_v2(input_shapes, rates, kernel_initializer, kernel_regularizer, no_outputs, no_layer, unit):
@@ -143,7 +168,10 @@ def evaluate_model(number, dataset, output, rs, dur, model_df):
         verbose = 1
 
         # define model
-        best_model = create_model_v2(shape_input, rate, "he_normal", L2(l=0.01), num_outputs, layers, units)
+        if (number == 1 or number == 2):
+            best_model = create_model_v2(shape_input, rate, "he_normal", L2(l=0.01), num_outputs, layers, units)
+        else:
+            best_model = create_model(shape_input, rate, "he_normal", num_outputs, layers, units)
 
         best_model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=["accuracy"])
         best_model.summary()
@@ -228,11 +256,11 @@ def evaluate_model(number, dataset, output, rs, dur, model_df):
 # Load Data
 best_models_f1 = pd.read_csv(best_models_loc[0], index_col=0)
 best_models_f2 = pd.read_csv(best_models_loc[1], index_col=0)
-# best_models_f3 = pd.read_csv(best_models_loc[2], index_col=0)
+best_models_f3 = pd.read_csv(best_models_loc[2], index_col=0)
 
 history_f1 = evaluate_model(1, V_feeder_CWT[0], Branch_Output_sorted[0], Rs[0], Duration[0], best_models_f1)
 joblib.dump(history_f1, results_dic + r'\history_f1.joblib')
 history_f2 = evaluate_model(2, V_feeder_CWT[1], Branch_Output_sorted[1], Rs[1], Duration[1], best_models_f2)
 joblib.dump(history_f2, results_dic + r'\history_f2.joblib')
-# history_f3 = evaluate_model(3, V_feeder_CWT[2], Branch_Output_sorted[2], Rs[2], Duration[2], best_models_f3)
-# joblib.dump(history_f3, results_dic + r'\history_f3.joblib')
+history_f3 = evaluate_model(3, V_feeder_CWT[2], Branch_Output_sorted[2], Rs[2], Duration[2], best_models_f3)
+joblib.dump(history_f3, results_dic + r'\history_f3.joblib')
