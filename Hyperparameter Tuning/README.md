@@ -24,7 +24,7 @@ Below, a process line is shown explaining the order of the scripts' execution.
 15. *Branch_HyperOpt_DMDCWT_1_not_full_v2.py* searches the best-suited hyperparameters for the Feeder A - Faulty Branch Neural Network (FBNN_1).
 16. *Branch_HyperOpt_DMDCWT_2_not_full_v2.py* searches the best-suited hyperparameters for the Feeder B - Faulty Branch Neural Network (FBNN_2).
 17. *Branch_HyperOpt_DMDCWT_3_not_full_v1.py* searches the best-suited hyperparameters for the Feeder C - Faulty Branch Neural Network (FBNN_3).
-18. *Fault_HyperOpt_DMDCWT_not_full_v1.py* searches the best-suited hyperparameters for the Fault Class Neural Network (FCNN).
+18. *Fault_HyperOpt_DMDCWT_not_full_v2.py* searches the best-suited hyperparameters for the Fault Class Neural Network (FCNN).
 19. *Distance_HyperOpt_DMDCWT_not_full_v1.py* searches the best-suited hyperparameters for the Fault Distance Neural Network (FDNN).
 
 
