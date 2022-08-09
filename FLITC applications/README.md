@@ -4,7 +4,7 @@ This is the final part of the FLITC application.
 
 The folder contains code for each type of implemented DNN which is designed to run each component of the FLITC Fault Diagnosis Toolkit.
 
-In the second step of the application, [the Hyperparameter Tuning](https://github.com/tombax7/FLITC-application/tree/main/Hyperparameter%20Tuning) step, an algorithm is used to search the optimal hyperparameters of each DNN's model to maximize the DNN's accuracy. In this step, the best 3 hyperparameter sets are retrained to showcase each DNN's performance.
+In the second step of the application, the [Hyperparameter Tuning](https://github.com/tombax7/FLITC-application/tree/main/Hyperparameter%20Tuning) step, an algorithm is used to search the optimal hyperparameters of each DNN's model to maximize the DNN's accuracy. In this step, the best 3 hyperparameter sets are retrained to showcase each DNN's performance.
 
  
 ## The following code handles:
