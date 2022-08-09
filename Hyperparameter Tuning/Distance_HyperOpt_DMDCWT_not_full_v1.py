@@ -158,7 +158,7 @@ def create_model_v2(input_shapes, rates, kernel_initializer, kernel_regularizer,
 
 
 def best_csv(dataframe, best_csv_loc):
-    sorted_df = dataframe.sort_values(by=['Val_Loss (%)'])
+    sorted_df = dataframe.sort_values(by=['Loss (%)'])
     best_df = sorted_df.head(3)
     write_csv(best_df, best_csv_loc)
     return best_df
