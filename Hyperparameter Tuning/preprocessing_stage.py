@@ -56,9 +56,7 @@ def preprocess():
     voltage_int_path = directory + r'\V_int.joblib'
     Iabc_path = directory + r'\Iabc.joblib'
     class_path = directory + r'\Class.joblib'
-    scenario_length = [743, 1907, 1907, 1907, 205, 205, 205, 477, 477, 477, 163, 245]
-    array = np.array(scenario_length) * 3
-    scenario_length = list(array)
+    scenario_length = [44580, 114420, 114420, 114420, 12264, 12264, 12264, 28608, 28608, 28608, 9804, 14689]
     
     if not (os.path.exists(dataset_path) and os.path.exists(class_path)):
         parser.create_dataset()

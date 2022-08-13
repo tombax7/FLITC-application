@@ -48,9 +48,7 @@ def shuffle_dataset(dataset, output_class, rs, dur):
     x_trn, x_tst, y_trn, y_tst = [], [], [], []
     rs_trn, rs_tst, dur_trn, dur_tst = [], [], [], []
 
-    scenario_length = [743, 1907, 1907, 1907, 205, 205, 205, 477, 477, 477, 163, 245]
-    array = np.array(scenario_length) * 3
-    scenario_length = list(array)
+    scenario_length = [44580, 114420, 114420, 114420, 12264, 12264, 12264, 28608, 28608, 28608, 9804, 14689]
 
     for idx in range(len(scenario_length)):
         x_train, x_test, y_train, y_test, rs_train, rs_test, dur_train, dur_test = train_test_split(

@@ -8,7 +8,7 @@ Distance_Class_path = directory + r'\Distance_Output.joblib'
 Distance_Class = joblib.load(Distance_Class_path)
 
 def distributer(dist_class):
-    new_class = dist_class[3*743:]
+    new_class = dist_class[44580:]
     
     return new_class
 
